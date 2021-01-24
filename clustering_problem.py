@@ -16,13 +16,14 @@ def init(file_name):
 
 def main():
     # initializing points
-    points = init("test1.csv")
+    points = init("sample2.csv")
 
     # running KCM algorithm
     kcm = kcm_clustering.KCM(points, min_clusters_num, max_clusters_num, m)
     kcm.kcm_cluster()
 
     # plotting the result
+    kcm.kcm_plot()
 
 
 

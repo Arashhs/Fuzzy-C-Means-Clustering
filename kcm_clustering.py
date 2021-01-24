@@ -1,19 +1,23 @@
-import random, math
+import random, math, copy
+import matplotlib.pyplot as plt
+
 
 class Point:
     def __init__(self, values):
         self.values = values # values for each point
         self.unit_intervals = [] # unit intervals for this point in regards to each center
+        self.label = None # label that shows each point belongs to which cluster
 
 
 class KCM:
-    def __init__(self, points, min_clusters_num, max_clusters_num, m, convergence_limit=0.01):
+    def __init__(self, points, min_clusters_num, max_clusters_num, m, convergence_limit=0.005):
         self.points = points
         self.min_clusters_num = min_clusters_num
         self.max_clusters_num = max_clusters_num
         self.centers = []
         self.m = m
         self.convergence_limit = convergence_limit
+        self.clusters = []
 
     
     # simply generating random centers
@@ -103,7 +107,7 @@ class KCM:
 
         # while centers are not converged, run the algorithm
         while True:
-            old_centers = self.centers.copy()
+            old_centers = copy.deepcopy(self.centers)
 
             # updating u_ik values
             for k in range(len(self.points)):
@@ -123,11 +127,29 @@ class KCM:
     # calculating the Entropy for the given points and centers
     def calculate_entropy(self):
         entropy = 0
+        c = len(self.centers)
         for i in range(len(self.centers)):
             for k in range(len(self.points)):
                 uik = self.points[k].unit_intervals[i]
                 entropy = entropy - uik*math.log(uik)
-        return entropy
+        return entropy/math.log(c)
+
+
+    # label each point to show the cluster it belongs to
+    def label_points(self):
+        for point in self.points:
+            max_index = 0
+            for i in range(len(point.unit_intervals)):
+                if point.unit_intervals[i] > point.unit_intervals[max_index]:
+                    max_index = i
+            point.label = max_index
+
+
+    def build_clusters(self):
+        self.label_points()
+        self.clusters = [[] for i in range(len(self.centers))]
+        for point in self.points:
+            self.clusters[point.label].append(point)
 
 
 
@@ -135,12 +157,41 @@ class KCM:
     # running the KCM algorithm for different number of centers and finding the appropriate one
     def kcm_cluster(self):
         entropies = []
+        all_points = []
+        all_centers = []
+        all_clusters = []
         for i in range(self.min_clusters_num, self.max_clusters_num + 1):
             self.run_cluster(i)
             entropy = self.calculate_entropy()
             entropies.append(entropy)
             print("Number of centers: {}, Entropy: {}".format(i, entropy))
-        print(self.centers)
+            self.build_clusters()
+            all_points.append(copy.deepcopy(self.points))
+            all_centers.append(copy.deepcopy(self.centers))
+            all_clusters.append(copy.deepcopy(self.clusters))
+        min_index = 0
+        for i in range(len(entropies)):
+            if entropies[i] < entropies[min_index]:
+                min_index = i
+        self.points = all_points[min_index]
+        self.centers = all_centers[min_index]
+        self.clusters = all_clusters[min_index]
+
+    
+    # plot the result
+    def kcm_plot(self):
+        colors = ["green","blue","yellow","pink","black","orange","purple","beige","brown","gray","cyan","magenta"]
+        centers_x = [c[0] for c in self.centers]
+        centers_y = [c[1] for c in self.centers]
+        for i in range(len(self.clusters)):
+            x_values = [y.values[0] for y in [x for x in self.clusters[i]]]
+            y_values = [y.values[1] for y in [x for x in self.clusters[i]]]
+            plt.scatter(x_values, y_values, c=colors[i])
+        plt.scatter(centers_x, centers_y, c="red", s=40)
+        plt.show()
+
+
+
 
 
 
