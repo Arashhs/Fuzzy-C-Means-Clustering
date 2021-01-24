@@ -119,13 +119,27 @@ class KCM:
         
         return self.centers
 
-            
+    
+    # calculating the Entropy for the given points and centers
+    def calculate_entropy(self):
+        entropy = 0
+        for i in range(len(self.centers)):
+            for k in range(len(self.points)):
+                uik = self.points[k].unit_intervals[i]
+                entropy = entropy - uik*math.log(uik)
+        return entropy
+
 
 
     
     # running the KCM algorithm for different number of centers and finding the appropriate one
     def kcm_cluster(self):
-        self.run_cluster(3)
+        entropies = []
+        for i in range(self.min_clusters_num, self.max_clusters_num + 1):
+            self.run_cluster(i)
+            entropy = self.calculate_entropy()
+            entropies.append(entropy)
+            print("Number of centers: {}, Entropy: {}".format(i, entropy))
         print(self.centers)
 
 
