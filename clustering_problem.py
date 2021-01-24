@@ -23,7 +23,6 @@ def main():
     kcm.kcm_cluster()
 
     # plotting the result
-    print("W")
 
 
 
