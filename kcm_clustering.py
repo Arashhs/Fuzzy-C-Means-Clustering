@@ -151,6 +151,17 @@ class KCM:
         for point in self.points:
             self.clusters[point.label].append(point)
 
+    
+    # printing the centers
+    def print_centers(self):
+        centers = self.centers
+        for i in range(len(centers)):
+            pr = "Center {}: ".format(i+1)
+            for j in range(len(centers[i])):
+                pr += str(centers[i][j]) + ', '
+            pr = pr[:-1]
+            print(pr)
+
 
 
     
@@ -176,6 +187,8 @@ class KCM:
         self.points = all_points[min_index]
         self.centers = all_centers[min_index]
         self.clusters = all_clusters[min_index]
+        print("\nBest number of centers:", min_index + self.min_clusters_num)
+        self.print_centers()
 
     
     # plot the result

@@ -16,7 +16,7 @@ def init(file_name):
 
 def main():
     # initializing points
-    points = init("sample2.csv")
+    points = init("sample1.csv")
 
     # running KCM algorithm
     kcm = kcm_clustering.KCM(points, min_clusters_num, max_clusters_num, m)
