@@ -189,6 +189,8 @@ class KCM:
         self.clusters = all_clusters[min_index]
         print("\nBest number of centers:", min_index + self.min_clusters_num)
         self.print_centers()
+        cost = self.calculate_cost()
+        print("Cost:", cost)
 
     
     # plot the result
@@ -202,6 +204,19 @@ class KCM:
             plt.scatter(x_values, y_values, c=colors[i])
         plt.scatter(centers_x, centers_y, c="red", s=40)
         plt.show()
+
+    
+    # calculating the cost
+    def calculate_cost(self):
+        cost = 0
+        for j in range(len(self.points)):
+            for i in range(len(self.centers)):
+                uij = self.points[j].unit_intervals[i]
+                xj = self.points[j].values
+                vi = self.centers[i]
+                square_distance = self.calculate_distance(xj, vi) ** 2
+                cost += (uij**self.m) * square_distance
+        return cost
 
 
 
